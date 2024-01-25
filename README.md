@@ -1,1 +1,1 @@
-# ds-club-project
+# ai-ghostwriter
