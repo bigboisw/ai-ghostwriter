@@ -20,9 +20,9 @@ TRACK_DURATION = 60 # measured in seconds
 SAMPLES_PER_TRACK = sr * TRACK_DURATION
 
 audio_folder = "Soundcloud Songs"
+Save_path = "drake_lyric_data"
 
-
-def save_mfcc(dataset_path, n_mfcc=13, sr=sr, n_fft=n_fft, hop_length=hop_length, num_segments=5):
+def save_mfcc(dataset_path, Save_path, n_mfcc=13, sr=sr, n_fft=n_fft, hop_length=hop_length, num_segments=5):
     data = {
         "mfcc": []
     }
@@ -52,7 +52,7 @@ def save_mfcc(dataset_path, n_mfcc=13, sr=sr, n_fft=n_fft, hop_length=hop_length
 
     df = pd.DataFrame.from_dict(data)
 
-    df.to_csv("mfcc_features.csv")
+    df.to_csv("drake_lyric_data")
 
 
 
