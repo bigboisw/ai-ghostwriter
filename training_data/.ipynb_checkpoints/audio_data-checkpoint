@@ -1,0 +1,56 @@
+import librosa as librosa
+import numpy as np
+import librosa.display
+import pandas as pd
+import os
+from sklearn.model_selection import train_test_split
+import math
+import glob
+
+
+#Set parameters
+
+sr = 22050
+TRACK_DURATION = 60 # measured in seconds
+SAMPLES_PER_TRACK = sr * TRACK_DURATION
+hop_length = 512
+n_fft = 2048
+block_length = 4096
+frame_length = 2048
+num_segments = 5
+
+
+paths = glob.glob("*.mp3")
+
+features = {}
+samples_per_segment = int(SAMPLES_PER_TRACK / num_segments)
+num_mfcc_vectors_per_segment = math.ceil(samples_per_segment / hop_length)
+
+for path in paths:
+    file_name = path  # Store the file name for later use
+    features[file_name] = []  # Initialize features list for the file
+
+    # Initialize a stream
+    stream = librosa.stream(path, block_length=block_length,
+                            frame_length=frame_length,
+                            hop_length=hop_length, duration=60)
+
+    for d in range(num_segments):
+        start = samples_per_segment * d
+        finish = start + samples_per_segment
+
+        # Loop through each block in the stream
+        for y_log in stream:
+            # Calculate MFCC
+            mfcc = librosa.feature.mfcc(y=y_log[start:finish], n_fft=n_fft, hop_length=hop_length, n_mfcc=13)
+            mfcc = mfcc.T
+
+            if len(mfcc) == num_mfcc_vectors_per_segment:
+                features[file_name].append(mfcc)
+                print(features)
+
+# Now, 'features' dictionary contains file names as keys and corresponding MFCC features as values
+
+# Convert the dictionary to DataFrame and save it to a CSV file
+df = pd.DataFrame({'file_name': list(features.keys()), 'mfccs': list(features.values())})
+df.to_csv("mfcc_features.csv", index=False)
